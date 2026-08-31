@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard genitori · Aura Mentor</title>
+<meta name="description" content="Segui i progressi di tuo figlio o tua figlia su Aura Mentor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #150a26;
+    --bg-elevated: #1f1038;
+    --bg-elevated-2: #271345;
+    --border: rgba(255,255,255,0.08);
+    --violet: #b026ff;
+    --violet-soft: rgba(176,38,255,0.16);
+    --cyan: #22d3ee;
+    --text: #f5f3fa;
+    --text-dim: #a99bc4;
+    --text-faint: #7c6e96;
+    --error: #ff6b6b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse 900px 600px at 50% -10%, rgba(176,38,255,0.20), transparent),
+                var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, .num {
+    font-family: 'Manrope', system-ui, sans-serif;
+  }
+
+  .wrap {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 48px 20px 64px;
+  }
+
+  .wrap.ampio { max-width: 720px; }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .header .cap {
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--violet-soft);
+    border-radius: 11px;
+    font-size: 19px;
+  }
+
+  .header .titolo {
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+
+  .header .sotto {
+    color: var(--text-dim);
+    font-size: 12.5px;
+    margin-top: 1px;
+  }
+
+  /* --- Card di accoppiamento / accesso --- */
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+  }
+
+  .card h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    letter-spacing: -0.015em;
+  }
+
+  .card p.desc {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 24px;
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--bg-elevated-2);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 22px;
+  }
+
+  .tabs button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 9px 0;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .tabs button.attivo {
+    background: var(--violet);
+    color: white;
+  }
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin: 16px 0 6px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input {
+    width: 100%;
+    background: var(--bg-elevated-2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input::placeholder { color: var(--text-faint); }
+  input:focus { border-color: var(--violet); }
+
+  input.codice {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  button.principale {
+    width: 100%;
+    background: var(--violet);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  button.principale:hover { opacity: 0.92; }
+  button.principale:active { transform: scale(0.99); }
+  button.principale:disabled { opacity: 0.55; cursor: default; }
+
+  .errore {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 14px;
+    line-height: 1.4;
+    display: none;
+  }
+
+  .successo {
+    color: var(--cyan);
+    font-size: 13px;
+    margin-top: 14px;
+    line-height: 1.4;
+    display: none;
+  }
+
+  .nota-legale {
+    color: var(--text-faint);
+    font-size: 11.5px;
+    line-height: 1.5;
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  /* --- Dashboard --- */
+
+  .top-dash {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .esci {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 4px 0;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, rgba(176,38,255,0.22), rgba(34,211,238,0.08));
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 28px 26px;
+    margin-bottom: 18px;
+  }
+
+  .hero .num {
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .hero .etichetta {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-top: 8px;
+  }
+
+  .griglia {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .stat {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 16px;
+  }
+
+  .stat .num {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .stat .etichetta {
+    color: var(--text-dim);
+    font-size: 12.5px;
+    margin-top: 4px;
+    line-height: 1.35;
+  }
+
+  .sezione {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 20px 6px;
+    margin-top: 14px;
+  }
+
+  .sezione h2 {
+    font-size: 14.5px;
+    font-weight: 700;
+    margin: 0 0 14px;
+  }
+
+  .barra-riga {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .barra-riga .nome {
+    width: 128px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .barra-riga .traccia {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-elevated-2);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .barra-riga .riempimento {
+    height: 100%;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    border-radius: 5px;
+  }
+
+  .barra-riga .valore {
+    width: 26px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .badge-blocco {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-elevated-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+
+  .voti-lista {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+  }
+
+  .voto-pill {
+    background: var(--bg-elevated-2);
+    border-radius: 9px;
+    padding: 8px 12px;
+    text-align: center;
+    min-width: 52px;
+  }
+
+  .voto-pill .v {
+    font-size: 17px;
+    font-weight: 800;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .voto-pill .d {
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-top: 2px;
+  }
+
+  .caricamento {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .piano-pill {
+    display: inline-block;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--cyan);
+    color: #062b30;
+  }
+
+  .piano-pill.free { background: var(--bg-elevated-2); color: var(--text-dim); }
+
+  @media (max-width: 420px) {
+    .griglia { grid-template-columns: 1fr 1fr; }
+    .hero .num { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="contenitore">
+  <div class="header">
+    <div class="cap">🎓</div>
+    <div>
+      <div class="titolo">Aura Mentor</div>
+      <div class="sotto">Dashboard genitori</div>
+    </div>
+  </div>
+
+  <div id="area-accesso" class="card">
+    <h1>Segui i progressi</h1>
+    <p class="desc">Vedi quanto studia, in quali materie, e i suoi voti stimati. Non mostriamo mai il contenuto delle sue conversazioni.</p>
+
+    <div class="tabs">
+      <button id="tab-collega" class="attivo" onclick="mostraTab('collega')">Ho un codice</button>
+      <button id="tab-accedi" onclick="mostraTab('accedi')">Ho già accesso</button>
+    </div>
+
+    <form id="form-collega" onsubmit="collegaGenitore(event)">
+      <label for="collega-codice">Codice ricevuto da tuo figlio/a</label>
+      <input id="collega-codice" class="codice" placeholder="ABC123" maxlength="8" required autocomplete="off">
+
+      <label for="collega-email">La tua email</label>
+      <input id="collega-email" type="email" placeholder="nome@esempio.it" required>
+
+      <label for="collega-telefono">Telefono <span style="font-weight:400;color:var(--text-faint)">(facoltativo)</span></label>
+      <input id="collega-telefono" type="tel" placeholder="+39 ...">
+
+      <button type="submit" class="principale">Collega e accedi</button>
+      <p class="errore" id="errore-collega"></p>
+    </form>
+
+    <form id="form-accedi" onsubmit="accediGenitore(event)" style="display:none">
+      <label for="accedi-email">La tua email</label>
+      <input id="accedi-email" type="email" placeholder="nome@esempio.it" required>
+
+      <label for="accedi-token">Codice di accesso</label>
+      <input id="accedi-token" placeholder="Ricevuto al primo collegamento" required autocomplete="off">
+
+      <button type="submit" class="principale">Accedi alla dashboard</button>
+      <p class="errore" id="errore-accedi"></p>
+    </form>
+
+    <p class="nota-legale">Il codice per collegarti lo trova tuo figlio/a nell'app, sotto "Info e legale". Ogni codice è valido per pochi minuti.</p>
+  </div>
+
+  <div id="area-dashboard" style="display:none"></div>
+</div>
+
+<script>
+  const API_BASE = 'https://auramentor.onrender.com';
+
+  function mostraTab(quale) {
+    const collega = quale === 'collega';
+    document.getElementById('tab-collega').classList.toggle('attivo', collega);
+    document.getElementById('tab-accedi').classList.toggle('attivo', !collega);
+    document.getElementById('form-collega').style.display = collega ? 'block' : 'none';
+    document.getElementById('form-accedi').style.display = collega ? 'none' : 'block';
+  }
+
+  function mostraErrore(id, messaggio) {
+    const el = document.getElementById(id);
+    el.textContent = messaggio;
+    el.style.display = 'block';
+  }
+
+  function nascondiErrore(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  async function collegaGenitore(evento) {
+    evento.preventDefault();
+    nascondiErrore('errore-collega');
+    const bottone = evento.target.querySelector('button');
+    bottone.disabled = true;
+    bottone.textContent = 'Collegamento...';
+
+    const emailGenitore = document.getElementById('collega-email').value.trim();
+    const telefonoGenitore = document.getElementById('collega-telefono').value.trim();
+    const codiceInserito = document.getElementById('collega-codice').value.trim().toUpperCase();
+
+    try {
+      const risposta = await fetch(`${API_BASE}/api/accoppia-genitore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailGenitore, telefonoGenitore, codiceInserito }),
+      });
+      const dati = await risposta.json();
+
+      if (!risposta.ok) {
+        mostraErrore('errore-collega', dati.error || 'Codice non valido. Chiedi a tuo figlio/a di generarne uno nuovo dall\'app.');
+        bottone.disabled = false;
+        bottone.textContent = 'Collega e accedi';
+        return;
+      }
+
+      salvaCredenziali(emailGenitore, dati.dashboardToken);
+      await caricaDashboard(emailGenitore, dati.dashboardToken);
+    } catch (e) {
+      mostraErrore('errore-collega', 'Impossibile contattare il server. Controlla la connessione e riprova.');
+      bottone.disabled = false;
+      bottone.textContent = 'Collega e accedi';
+    }
+  }
+
+  async function accediGenitore(evento) {
+    evento.preventDefault();
+    nascondiErrore('errore-accedi');
+    const bottone = evento.target.querySelector('button');
+    bottone.disabled = true;
+    bottone.textContent = 'Accesso...';
+
+    const emailGenitore = document.getElementById('accedi-email').value.trim();
+    const dashboardToken = document.getElementById('accedi-token').value.trim();
+
+    try {
+      await caricaDashboard(emailGenitore, dashboardToken, () => {
+        bottone.disabled = false;
+        bottone.textContent = 'Accedi alla dashboard';
+      });
+    } catch (e) {
+      mostraErrore('errore-accedi', 'Impossibile contattare il server. Controlla la connessione e riprova.');
+      bottone.disabled = false;
+      bottone.textContent = 'Accedi alla dashboard';
+    }
+  }
+
+  function salvaCredenziali(email, token) {
+    try {
+      localStorage.setItem('aura_genitore_email', email);
+      localStorage.setItem('aura_genitore_token', token);
+    } catch (e) { /* localStorage non disponibile: si accederà di nuovo manualmente la prossima volta */ }
+  }
+
+  function pulisciCredenziali() {
+    try {
+      localStorage.removeItem('aura_genitore_email');
+      localStorage.removeItem('aura_genitore_token');
+    } catch (e) {}
+  }
+
+  const NOMI_MODALITA = {
+    spiegami_concetto: 'Spiegami un concetto',
+    aiuto_compiti: 'Aiuto compiti',
+    interrogami: 'Interrogami',
+    ripasso: 'Ripasso',
+    correggi_compito: 'Correggi compito',
+    scanner_brutti_voti: 'Scanner verifiche',
+    altro: 'Altro',
+  };
+
+  async function caricaDashboard(emailGenitore, dashboardToken, onErroreCallback) {
+    const risposta = await fetch(`${API_BASE}/api/dashboard-genitore`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailGenitore, dashboardToken }),
+    });
+    const dati = await risposta.json();
+
+    if (!risposta.ok) {
+      pulisciCredenziali();
+      const messaggio = dati.error === 'Token di accesso non valido' || dati.error === 'Nessun figlio associato a questa email'
+        ? 'Email o codice di accesso non corretti.'
+        : (dati.error || 'Accesso non riuscito.');
+      if (document.getElementById('form-accedi').style.display !== 'none') {
+        mostraErrore('errore-accedi', messaggio);
+      } else {
+        mostraErrore('errore-collega', messaggio);
+      }
+      if (onErroreCallback) onErroreCallback();
+      return;
+    }
+
+    disegnaDashboard(dati);
+  }
+
+  function formattaScadenza(iso) {
+    if (!iso) return null;
+    const d = new Date(iso);
+    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function disegnaDashboard(dati) {
+    document.getElementById('area-accesso').style.display = 'none';
+    document.getElementById('contenitore').classList.add('ampio');
+
+    const nomePiano = dati.piano === 'pro' ? 'Pro' : dati.piano === 'base' ? 'Base' : 'Prova gratuita';
+    const scadenzaTesto = formattaScadenza(dati.scadenza);
+
+    const vociModalita = Object.entries(dati.conteggioModalita || {}).sort((a, b) => b[1] - a[1]);
+    const massimoModalita = vociModalita.length ? vociModalita[0][1] : 1;
+
+    let sezioneVoti = '';
+    if (dati.pagellaPredittiva && dati.pagellaPredittiva.sbloccata && dati.pagellaPredittiva.storico.length > 0) {
+      const pills = dati.pagellaPredittiva.storico.slice(-8).map(v => {
+        const d = new Date(v.data);
+        const dataBreve = d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+        return `<div class="voto-pill"><div class="v">${v.voto}</div><div class="d">${dataBreve}</div></div>`;
+      }).join('');
+      sezioneVoti = `
+        <div class="sezione">
+          <h2>Andamento voti stimati</h2>
+          <div class="voti-lista">${pills}</div>
+        </div>`;
+    } else if (dati.piano !== 'pro') {
+      sezioneVoti = `
+        <div class="sezione">
+          <h2>Andamento voti stimati</h2>
+          <div class="badge-blocco">🔒 Disponibile con il piano Pro</div>
+        </div>`;
+    }
+
+    let sezioneModalita = '';
+    if (vociModalita.length > 0) {
+      const righe = vociModalita.map(([id, conteggio]) => {
+        const percentuale = Math.round((conteggio / massimoModalita) * 100);
+        const nome = NOMI_MODALITA[id] || id;
+        return `
+          <div class="barra-riga">
+            <div class="nome">${nome}</div>
+            <div class="traccia"><div class="riempimento" style="width:${percentuale}%"></div></div>
+            <div class="valore">${conteggio}</div>
+          </div>`;
+      }).join('');
+      sezioneModalita = `
+        <div class="sezione">
+          <h2>Come usa l'app</h2>
+          ${righe}
+        </div>`;
+    }
+
+    document.getElementById('area-dashboard').innerHTML = `
+      <div class="top-dash">
+        <span class="piano-pill ${dati.piano === 'free' ? 'free' : ''}">${nomePiano}</span>
+        <button class="esci" onclick="esci()">Cambia account</button>
+      </div>
+
+      <div class="hero">
+        <div class="num">${dati.oreStudio}</div>
+        <div class="etichetta">ore di studio (ultimi 500 scambi)</div>
+      </div>
+
+      <div class="griglia">
+        <div class="stat">
+          <div class="num">${dati.totaleMessaggi}</div>
+          <div class="etichetta">domande fatte</div>
+        </div>
+        <div class="stat">
+          <div class="num">${dati.simulazioniInterrogazione}</div>
+          <div class="etichetta">interrogazioni simulate</div>
+        </div>
+      </div>
+
+      ${scadenzaTesto ? `<div class="stat" style="margin-bottom:14px"><div class="etichetta" style="margin-top:0">Abbonamento valido fino al</div><div class="num" style="font-size:16px;margin-top:4px">${scadenzaTesto}</div></div>` : ''}
+
+      ${sezioneModalita}
+      ${sezioneVoti}
+    `;
+    document.getElementById('area-dashboard').style.display = 'block';
+  }
+
+  function esci() {
+    pulisciCredenziali();
+    location.reload();
+  }
+
+  // All'apertura della pagina: se ci sono credenziali salvate, prova ad
+  // accedere subito senza far ricompilare il modulo al genitore.
+  (function avvio() {
+    let email, token;
+    try {
+      email = localStorage.getItem('aura_genitore_email');
+      token = localStorage.getItem('aura_genitore_token');
+    } catch (e) { return; }
+
+    if (email && token) {
+      document.getElementById('area-accesso').innerHTML = '<div class="caricamento">Caricamento...</div>';
+      caricaDashboard(email, token);
+    }
+  })();
+</script>
+
+</body>
+</html>
